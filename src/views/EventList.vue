@@ -1,12 +1,13 @@
 <template>
-  <h1>Events for Good</h1>
+  <h1>Events for {{ user.userInfo.name }}</h1>
   <div class="events">
-    <EventCard v-for="event in events" :key="event.id" :event="event" />
+    <EventCard v-for="event in event.events" :key="event.id" :event="event" />
   </div>
 </template>
 
 <script>
 import EventCard from '@/components/EventCard.vue'
+import { mapActions, mapState } from 'vuex'
 
 export default {
   name: 'EventList',
@@ -14,12 +15,13 @@ export default {
     EventCard
   },
   created() {
-    this.$store.dispatch('fetchEvents')
+    this.fetchEvents()
   },
   computed: {
-    events() {
-      return this.$store.state.events
-    }
+    ...mapState(['event', 'user'])
+  },
+  methods: {
+    ...mapActions('event',['fetchEvents'])
   }
 }
 </script>

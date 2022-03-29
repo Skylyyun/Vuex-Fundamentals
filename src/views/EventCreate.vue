@@ -5,12 +5,12 @@
 
   <form @submit.prevent="onSubmit">
     <label>Select a category: </label>
-    <select v-model="event.category">
+    <select v-model="eventNow.category">
       <option
         v-for="option in categories"
         :value="option"
         :key="option"
-        :selected="option === event.category"
+        :selected="option === eventNow.category"
       >{{ option }}</option>
     </select>
 
@@ -18,14 +18,14 @@
 
     <label>Title</label>
     <input
-      v-model="event.title"
+      v-model="eventNow.title"
       type="text"
       placeholder="Title"
     >
 
     <label>Description</label>
     <input
-      v-model="event.description"
+      v-model="eventNow.description"
       type="text"
       placeholder="Description"
     />
@@ -34,7 +34,7 @@
 
     <label>Location</label>
     <input
-      v-model="event.location"
+      v-model="eventNow.location"
       type="text"
       placeholder="Location"
     />
@@ -42,29 +42,29 @@
     <h3>When is your event?</h3>
     <label>Date</label>
     <input
-      v-model="event.date"
+      v-model="eventNow.date"
       type="text"
       placeholder="Date"
     />
 
     <label>Time</label>
     <input
-      v-model="event.time"
+      v-model="eventNow.time"
       type="text"
       placeholder="Time"
     />
 
     <button type="submit">Submit</button>
   </form>
-  <div>{{$store.state.event}}</div>
+  <div>{{ event.currentEvent }}</div>
   <p>events</p>
-  <div>{{$store.state.events}}</div>
+  <div>{{ event.events }}</div>
 </div>
 </template>
 
 <script>
 import { v4 as uuidv4 } from 'uuid'
-
+import { mapState, mapActions} from 'vuex' // ADD
 
 export default {
   data () {
@@ -78,7 +78,7 @@ export default {
         'food',
         'community'
       ],
-      event: {
+      eventNow: {
         id: '',
         category: '',
         title: '',
@@ -91,17 +91,19 @@ export default {
     }
   },
   methods: {
+    ...mapActions('event', ['createEvent']),
+
     onSubmit() {
-      const event = {
-        ...this.event,
+      const eventNow = {
+        ...this.eventNow,
         id: uuidv4(),
-        organizer: this.$store.state.user
+        organizer: this.user.userInfo.name
       }
-      this.$store.dispatch('createEvent', event)
+      this.createEvent(eventNow)
         .then(() => {
           this.$router.push({
             name: 'EventDetails',
-            params: { id: event.id}
+            params: { id: eventNow.id}
           })
         })
         .catch(error => {
@@ -111,6 +113,9 @@ export default {
           })
         })
     }
+  },
+  computed: {
+    ...mapState(['user', 'event']) 
   }
 }
 </script>
